@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "esModuleInterop": true,
+    "target": "esnext",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "dist",
+    "lib": ["es2019", "dom"],
+    "declaration": true /* Generates corresponding '.d.ts' file. */,
+    "declarationDir": "dist",
+    "strict": true
+  },
+  "lib": "es2015",
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
