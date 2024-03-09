@@ -86,10 +86,13 @@ export class NetzOoeApiClient {
    * @return {string[]} - An array of strings representing the date range between from and to.
    */
   public generateDateRange(from: Date, to: Date): string[] {
+    //Create new dates to avoid mutating the input
+    const copiedFrom = new Date(from)
+    const copiedTo = new Date(to)
     const result: string[] = []
-    while (from <= to) {
-      result.push(from.toISOString().slice(0, 10))
-      from.setDate(from.getDate() + 1) //add one day to from-date
+    while (copiedFrom <= copiedTo) {
+      result.push(copiedFrom.toISOString().slice(0, 10))
+      copiedFrom.setDate(copiedFrom.getDate() + 1) //add one day to from-date
     }
     return result
   }
