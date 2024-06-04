@@ -1,7 +1,7 @@
 {
   "name": "netz-ooe-api-client",
-  "version": "1.0.4",
-  "description": "",
+  "version": "1.0.5",
+  "description": "Unofficial node.js API client for Austrian grid operator Netz OÖ.",
   "main": "dist/index.js",
   "scripts": {
     "start": "tsc && node dist/app.js",
@@ -10,7 +10,7 @@
     "cleanup": "rm -rf dist && mkdir dist",
     "prepublish": "npm run cleanup && npm run build:tsup && cp package.json dist/package.json"
   },
-  "keywords": ["Netz Oberösterreich", "Smart Meter", "Energy", "Power Grid Operator"],
+  "keywords": ["netzoberoesterreich", "smartmeter", "energy", "powergrid"],
   "author": "Martin Schwarz",
   "license": "MIT",
   "repository": {
