@@ -5,10 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "tsc && node dist/app.js",
-    "build": "tsc",
-    "build:tsup": "tsup src/index.ts --out-dir dist --format cjs,esm && tsc --emitDeclarationOnly",
-    "cleanup": "rm -rf dist && mkdir dist",
-    "prepublish": "pnpm run cleanup && pnpm run build:tsup && cp package.json dist/package.json",
+    "build": "tsdown src/index.ts --out-dir dist --format cjs,esm",
+    "prepublish": "pnpm run build && cp package.json dist/package.json",
     "test": "vitest run"
   },
   "keywords": [
@@ -27,7 +25,7 @@
     "@types/node": "^25.9.3",
     "@types/tough-cookie": "^4.0.5",
     "prettier": "^3.8.4",
-    "tsup": "^8.5.1",
+    "tsdown": "^0.22.2",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"
   },
