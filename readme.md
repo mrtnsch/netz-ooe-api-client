@@ -54,7 +54,3 @@ To get an overview of the available smart meters, you can use this request.
 ```typescript
 const dashboardView = await client.getDashboardView();
 ```
-## Todos
-* Proper error handling
-* Automating the authentication, reauthenticate after session expires
-* Documentation

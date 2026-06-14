@@ -3,6 +3,7 @@ import { wrapper } from 'axios-cookiejar-support'
 import axios, { AxiosInstance, AxiosResponse, RawAxiosResponseHeaders } from 'axios'
 import { BusinessPartnerOverview, Credentials, MeterData, MeterdataRequest } from './model/models'
 import { NetzOoeAuthenticationError, NetzOoeRequestError, NetzOoeSessionError } from './errors'
+import { version } from '../package.json' with { type: 'json' }
 
 export class NetzOoeApiClient {
   client: AxiosInstance
@@ -21,8 +22,7 @@ export class NetzOoeApiClient {
         jar: this.jar,
         baseURL: 'https://eservice.netzooe.at/',
         headers: {
-          'user-agent':
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+          'user-agent': `netz-ooe-api-client/${version}`,
           authority: 'eservice.netzooe.at',
           'content-type': 'application/json',
           origin: 'https://eservice.netzooe.at',

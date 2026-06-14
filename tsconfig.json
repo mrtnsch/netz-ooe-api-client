@@ -11,6 +11,7 @@
     "declaration": true /* Generates corresponding '.d.ts' file. */,
     "declarationDir": "dist",
     "strict": true,
+    "resolveJsonModule": true,
     "ignoreDeprecations": "6.0"
   },
   "lib": "es2015",

@@ -1,6 +1,6 @@
 {
   "name": "netz-ooe-api-client",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "Unofficial node.js API client for Austrian grid operator Netz OÖ.",
   "main": "dist/index.js",
   "scripts": {
