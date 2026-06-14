@@ -3,13 +3,15 @@
     "module": "esnext",
     "esModuleInterop": true,
     "target": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "sourceMap": true,
+    "rootDir": "src",
     "outDir": "dist",
     "lib": ["es2019", "dom"],
     "declaration": true /* Generates corresponding '.d.ts' file. */,
     "declarationDir": "dist",
-    "strict": true
+    "strict": true,
+    "ignoreDeprecations": "6.0"
   },
   "lib": "es2015",
   "include": ["src/**/*.ts"],

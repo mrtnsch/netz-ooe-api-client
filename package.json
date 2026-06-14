@@ -6,11 +6,16 @@
   "scripts": {
     "start": "tsc && node dist/app.js",
     "build": "tsc",
-    "build:tsup": "tsup src/index.ts --out-dir dist --format cjs,esm --dts",
+    "build:tsup": "tsup src/index.ts --out-dir dist --format cjs,esm && tsc --emitDeclarationOnly",
     "cleanup": "rm -rf dist && mkdir dist",
-    "prepublish": "npm run cleanup && npm run build:tsup && cp package.json dist/package.json"
+    "prepublish": "pnpm run cleanup && pnpm run build:tsup && cp package.json dist/package.json"
   },
-  "keywords": ["netzoberoesterreich", "smartmeter", "energy", "powergrid"],
+  "keywords": [
+    "netzoberoesterreich",
+    "smartmeter",
+    "energy",
+    "powergrid"
+  ],
   "author": "Martin Schwarz",
   "license": "MIT",
   "repository": {
@@ -19,17 +24,18 @@
   },
   "devDependencies": {
     "@types/tough-cookie": "^4.0.5",
-    "prettier": "^3.2.5",
-    "tsup": "^8.0.2",
-    "typescript": "^5.3.3"
+    "prettier": "^3.8.4",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
-    "axios": "^1.6.7",
-    "axios-cookiejar-support": "^5.0.0",
-    "tough-cookie": "^4.1.3"
+    "axios": "^1.17.0",
+    "axios-cookiejar-support": "^7.0.0",
+    "tough-cookie": "^6.0.1"
   },
   "files": [
     "/dist"
   ],
-  "types": "dist/index.d.ts"
+  "types": "dist/index.d.ts",
+  "packageManager": "pnpm@11.1.3"
 }
