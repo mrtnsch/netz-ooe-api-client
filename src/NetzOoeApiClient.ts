@@ -2,6 +2,7 @@ import { CookieJar } from 'tough-cookie'
 import { wrapper } from 'axios-cookiejar-support'
 import axios, { AxiosInstance, AxiosResponse, RawAxiosResponseHeaders } from 'axios'
 import { BusinessPartnerOverview, Credentials, MeterData, MeterdataRequest } from './model/models'
+import { NetzOoeAuthenticationError, NetzOoeRequestError, NetzOoeSessionError } from './errors'
 
 export class NetzOoeApiClient {
   client: AxiosInstance
@@ -32,49 +33,36 @@ export class NetzOoeApiClient {
   }
 
   public async performAuthFlow() {
-      await this.getLoginPage()
-      await this.performLogin()
-      const token = await this.getSessionInformation()
-      this.xsrfToken = token ?? ''
-      console.debug('Successfully authenticated against Netz OÖ Api')
+    await this.getLoginPage()
+    await this.performLogin()
+    this.xsrfToken = await this.getSessionInformation()
   }
 
-  public async getMeterData(
-    meterDataRequest: MeterdataRequest
-  ): Promise<MeterData | undefined> {
+  public async getMeterData(meterDataRequest: MeterdataRequest): Promise<MeterData> {
     return this.client
-      .post(
-        this.CONSUMPTION_ENDPOINT,
-        meterDataRequest,
-        {
-          maxBodyLength: Infinity,
-          headers: {
-            'x-xsrf-token': this.xsrfToken
-          }
-        }
-      )
+      .post(this.CONSUMPTION_ENDPOINT, meterDataRequest, {
+        maxBodyLength: Infinity,
+        headers: { 'x-xsrf-token': this.xsrfToken }
+      })
       .then((response: AxiosResponse<MeterData[], any>) => {
-        return response.data.shift()
+        const data = response.data.shift()
+        if (!data) throw new NetzOoeRequestError('No meter data returned for the given request')
+        return data
       })
       .catch((error) => {
-        console.error('An error occurred during fetching meter data', error.toJSON())
-        return undefined
+        if (error instanceof NetzOoeRequestError) throw error
+        throw new NetzOoeRequestError('Failed to fetch meter data', { cause: error })
       })
   }
 
   async getDashboardView(): Promise<BusinessPartnerOverview> {
     return this.client
       .get(this.DASHBOARD_ENDPOINT, {
-        headers: {
-          'x-xsrf-token': this.xsrfToken
-        }
+        headers: { 'x-xsrf-token': this.xsrfToken }
       })
-      .then((response: AxiosResponse<BusinessPartnerOverview, any>) => {
-        return response.data
-      })
+      .then((response: AxiosResponse<BusinessPartnerOverview, any>) => response.data)
       .catch((error) => {
-        console.error('An error occurred during fetching dashboard data', error.toJSON())
-        throw new Error('An error occurred during fetching dashboard data.')
+        throw new NetzOoeRequestError('Failed to fetch dashboard data', { cause: error })
       })
   }
 
@@ -106,7 +94,7 @@ export class NetzOoeApiClient {
    * @param {string} [dimension="ENERGY"] - The dimension of the meter data (default is "ENERGY").
    * @returns MeterdataRequest - The meter data request object.
    */
-  public buildMeterdataRequest(date: string, contractAccountNumber: string, meterPointNumber: string, dimension = "ENERGY"): MeterdataRequest {
+  public buildMeterdataRequest(date: string, contractAccountNumber: string, meterPointNumber: string, dimension: string = "ENERGY"): MeterdataRequest {
     return {
       "dimension": dimension,
       "pods": [
@@ -125,41 +113,32 @@ export class NetzOoeApiClient {
   }
 
   private async getLoginPage() {
-    return this.client.get('app/login')
-      .catch((error) => {
-        console.error('An error occurred during getting the login page', error.toJSON())
-      })
+    return this.client.get('app/login').catch((error) => {
+      throw new NetzOoeRequestError('Failed to load login page', { cause: error })
+    })
   }
 
   private async performLogin() {
-    return this.client.post('service/j_security_check', this.credentials)
-      .catch((error) => {
-        console.error('An error occurred during performing the login', error.toJSON())
-        return undefined
-      })
+    return this.client.post('service/j_security_check', this.credentials).catch((error) => {
+      throw new NetzOoeAuthenticationError('Authentication failed — check your credentials', { cause: error })
+    })
   }
 
-  private async getSessionInformation() {
-    const sessionRequest = await this.client.get(this.SESSION_ENDPOINT)
-      .then(response => response)
-      .catch((error) => {
-        console.error('An error occurred during getting session information', error.toJSON())
-        return undefined
-      })
-    if (sessionRequest == undefined) return undefined
-    return this.extractXsrfToken(sessionRequest.headers)
+  private async getSessionInformation(): Promise<string> {
+    const response = await this.client.get(this.SESSION_ENDPOINT).catch((error) => {
+      throw new NetzOoeRequestError('Failed to retrieve session information', { cause: error })
+    })
+    return this.extractXsrfToken(response.headers)
   }
 
-  private extractXsrfToken(headers: RawAxiosResponseHeaders) {
-    const extractedSetCookieHeader = headers['set-cookie']!
+  private extractXsrfToken(headers: RawAxiosResponseHeaders): string {
+    const setCookieHeader = headers['set-cookie']
+    if (!setCookieHeader) throw new NetzOoeSessionError('No set-cookie header in session response')
     const regex = /XSRF-TOKEN=([^\s;]+)/
-    for (const item of extractedSetCookieHeader) {
+    for (const item of setCookieHeader) {
       const match = item.match(regex)
-      if (match) {
-        return match[1]
-      }
+      if (match) return match[1]
     }
-    throw new Error("No XSRF token found.")
+    throw new NetzOoeSessionError('XSRF token not found in session cookies')
   }
-
 }

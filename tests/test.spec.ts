@@ -79,7 +79,6 @@ describe.skipIf(!hasCredentials)('integration', () => {
       client.buildMeterdataRequest(dateStr, account.contractAccountNumber, meterPoint)
     )
 
-    expect(meterData).toBeDefined()
-    expect(meterData!.meterPointAdministrationNumber).toBe(meterPoint)
+    expect(meterData.meterPointAdministrationNumber).toBe(meterPoint)
   })
 })
